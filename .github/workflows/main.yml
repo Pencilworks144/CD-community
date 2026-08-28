@@ -1,0 +1,19 @@
+name: CD Community
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get repository
+        uses: actions/checkout@v4
+
+      - name: Check CD Community
+        run: |
+          echo "CD Community is running!"
+          echo "Repository: Pencilworks144/CD-community"
