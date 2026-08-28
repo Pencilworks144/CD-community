@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CD Community — Gaming Social</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2d;--panel2:#18233b;--text:#f4f7ff;--muted:#9eabc4;--accent:#7c5cff;--accent2:#21d4a5}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(135deg,#080c18,#111a31);color:var(--text)}
+header{position:sticky;top:0;z-index:5;background:#0b1020ee;backdrop-filter:blur(12px);border-bottom:1px solid #26314b}
+nav{max-width:1200px;margin:auto;display:flex;align-items:center;gap:18px;padding:14px 20px}.logo{font-weight:900;font-size:24px;color:#fff}.logo span{color:var(--accent)}
+.search{flex:1;max-width:560px;background:#18233b;border:1px solid #2b3855;border-radius:12px;padding:11px 14px;color:#fff;outline:none}
+main{max-width:1200px;margin:auto;padding:24px 20px}.hero{padding:30px;border-radius:22px;background:linear-gradient(135deg,#20154d,#132f45);border:1px solid #34436a}
+.hero h1{margin:0 0 8px;font-size:38px}.hero p{color:#c6d0e5;max-width:760px}.stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.stat{background:#ffffff10;padding:10px 14px;border-radius:12px}.layout{display:grid;grid-template-columns:220px 1fr;gap:20px;margin-top:22px}
+aside,.card{background:var(--panel);border:1px solid #26314b;border-radius:18px}.side{padding:16px;height:max-content}.side button{width:100%;text-align:left;background:none;border:0;color:var(--text);padding:11px;border-radius:10px;cursor:pointer}.side button:hover{background:#ffffff0d}
+.feed{display:grid;gap:16px}.post{padding:18px}.posttop{display:flex;justify-content:space-between}.user{font-weight:800}.time{color:var(--muted);font-size:13px}.post p{line-height:1.5}.game{background:var(--panel2);border-radius:14px;padding:14px;display:flex;justify-content:space-between;gap:15px;align-items:center}.tag{font-size:12px;color:#cfd7e9;background:#ffffff10;padding:5px 8px;border-radius:999px}.actions{display:flex;gap:8px;margin-top:12px}.actions button,.primary{border:0;border-radius:9px;padding:8px 12px;background:#ffffff0c;color:#fff;cursor:pointer}.primary{background:var(--accent)}
+.library{margin-top:24px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}.gamecard{padding:14px;min-height:120px}.gamecard h3{margin:0 0 8px}.gamecard small{color:var(--muted)}.notice{color:var(--muted);font-size:13px;margin-top:12px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.side{display:none}.hero h1{font-size:30px}}
+
+.auth-overlay{position:fixed;inset:0;z-index:20;background:#070b16ee;backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-box{width:min(430px,100%);background:var(--panel);border:1px solid #34415e;border-radius:22px;padding:28px;box-shadow:0 20px 70px #0008}
+.auth-box h2{margin:22px 0 6px}.auth-tabs{display:flex;gap:8px;margin:22px 0}.auth-tab{flex:1;padding:11px;border:0;border-radius:10px;background:#ffffff0b;color:#fff;cursor:pointer}.auth-tab.active{background:var(--accent)}
+.auth-input{display:block;width:100%;margin:11px 0;padding:12px 13px;border-radius:10px;border:1px solid #33415e;background:#0c1324;color:#fff;outline:none}
+.auth-input:focus{border-color:var(--accent)}.auth-submit{width:100%;margin-top:8px}.auth-message{text-align:center;color:var(--accent2);min-height:20px;margin-top:14px;font-size:14px}
+</style>
+</head>
+<body>
+<div id="auth" class="auth-overlay">
+  <div class="auth-box">
+    <div class="logo">CD <span>Community</span></div>
+    <div class="auth-tabs">
+      <button id="signupTab" class="auth-tab active" onclick="showAuth('signup')">Sign Up</button>
+      <button id="loginTab" class="auth-tab" onclick="showAuth('login')">Log In</button>
+    </div>
+    <form id="signupForm" onsubmit="signup(event)">
+      <h2>Create your account</h2>
+      <p class="notice">Join CD Community and connect with gamers.</p>
+      <input class="auth-input" id="signupName" placeholder="Username" required>
+      <input class="auth-input" id="signupEmail" type="email" placeholder="Email" required>
+      <input class="auth-input" id="signupPassword" type="password" placeholder="Password" required>
+      <button class="primary auth-submit">Create Account</button>
+    </form>
+    <form id="loginForm" onsubmit="login(event)" style="display:none">
+      <h2>Welcome back</h2>
+      <p class="notice">Log in to continue to CD Community.</p>
+      <input class="auth-input" id="loginEmail" type="email" placeholder="Email" required>
+      <input class="auth-input" id="loginPassword" type="password" placeholder="Password" required>
+      <button class="primary auth-submit">Log In</button>
+    </form>
+    <div id="authMessage" class="auth-message"></div>
+  </div>
+</div>
+
+<header><nav>
+  <div class="logo">CD <span>Community</span></div>
+  <input id="search" class="search" placeholder="Search games, posts, platforms...">
+  <button class="primary" onclick="newPost()">＋ Post</button>
+  <button class="actions button" onclick="document.getElementById('auth').style.display='flex';showAuth('login')">Log In</button>
+</nav></header>
+
+<main>
+<section class="hero">
+  <h1>Welcome to CD Community 🎮</h1>
+  <p>A social space for gamers to share clips, reviews, collections, news, questions and discoveries.</p>
+  <div class="stats">
+    <div class="stat"><b>5,000,000</b> game catalog target</div>
+    <div class="stat"><b>Aug 28, 2026</b> catalog snapshot</div>
+    <div class="stat"><b>Community</b> powered</div>
+  </div>
+</section>
+
+<div class="layout">
+<aside class="side">
+  <button onclick="filterPosts('all')">🏠 Home</button>
+  <button onclick="filterPosts('clips')">🎬 Clips</button>
+  <button onclick="filterPosts('reviews')">⭐ Reviews</button>
+  <button onclick="filterPosts('news')">📰 News</button>
+  <button onclick="filterPosts('questions')">❓ Questions</button>
+  <button onclick="showGames()">🎮 Game Library</button>
+</aside>
+
+<section class="feed" id="feed">
+  <article class="card post" data-type="clips">
+    <div class="posttop"><span class="user">@PixelPilot</span><span class="time">12 min ago</span></div>
+    <p>What game are you playing today? Drop your favorite moment below!</p>
+    <div class="game"><div><b>Community Game Spotlight</b><br><span class="tag">DISCUSSION</span></div><span>🎮</span></div>
+    <div class="actions"><button onclick="like(this)">♡ Like</button><button onclick="comment()">💬 Comment</button><button>↗ Share</button></div>
+  </article>
+
+  <article class="card post" data-type="reviews">
+    <div class="posttop"><span class="user">@RetroRanger</span><span class="time">38 min ago</span></div>
+    <p>Just finished a classic and it still holds up. What older games should everyone try?</p>
+    <div class="actions"><button onclick="like(this)">♡ Like</button><button onclick="comment()">💬 Comment</button><button>↗ Share</button></div>
+  </article>
+
+  <article class="card post" data-type="questions">
+    <div class="posttop"><span class="user">@CDNewbie</span><span class="time">1 hr ago</span></div>
+    <p>Question: What makes a game fun to replay years later?</p>
+    <div class="actions"><button onclick="like(this)">♡ Like</button><button onclick="comment()">💬 Comment</button><button>↗ Share</button></div>
+  </article>
+</section>
+</div>
+
+<section class="library card" id="library">
+  <div style="padding:18px 18px 4px"><h2>🎮 Game Library</h2>
+  <p class="notice">This demo uses a searchable virtual catalog rather than embedding 5 million records. A real 5-million-game catalog should be loaded from a database/API.</p></div>
+  <div class="grid" id="games"></div>
+</section>
+</main>
+
+<script>
+function showAuth(mode){
+ document.getElementById("signupForm").style.display=mode==="signup"?"block":"none";
+ document.getElementById("loginForm").style.display=mode==="login"?"block":"none";
+ document.getElementById("signupTab").classList.toggle("active",mode==="signup");
+ document.getElementById("loginTab").classList.toggle("active",mode==="login");
+ document.getElementById("authMessage").textContent="";
+}
+function signup(e){
+ e.preventDefault();
+ const name=document.getElementById("signupName").value.trim();
+ document.getElementById("authMessage").textContent="Account created! Welcome, "+name+" 🎮";
+ setTimeout(()=>document.getElementById("auth").style.display="none",900);
+}
+function login(e){
+ e.preventDefault();
+ document.getElementById("authMessage").textContent="Logged in successfully! 🎮";
+ setTimeout(()=>document.getElementById("auth").style.display="none",900);
+}
+
+const sampleGames=[
+["Super Mario Bros.","NES"],["The Legend of Zelda","NES"],["Minecraft","PC / Console"],["Tetris","Multiple"],["Portal 2","PC / Console"],["The Sims","PC / Console"],["Sonic the Hedgehog","Genesis"],["Pokémon Red / Blue","Game Boy"],["Halo: Combat Evolved","Xbox / PC"],["Animal Crossing: New Horizons","Nintendo Switch"],["Stardew Valley","Multiple"],["Celeste","Multiple"]
+];
+
+function renderGames(list=sampleGames){
+ const box=document.getElementById("games");
+ box.innerHTML=list.map(g=>`<div class="card gamecard"><h3>${g[0]}</h3><small>${g[1]}</small></div>`).join("");
+}
+function filterPosts(type){
+ document.querySelectorAll(".post").forEach(p=>p.style.display=(type==="all"||p.dataset.type===type)?"block":"none");
+}
+function showGames(){document.getElementById("library").scrollIntoView({behavior:"smooth"})}
+function like(btn){btn.textContent=btn.textContent.includes("♡")?"♥ Liked":"♡ Like"}
+function comment(){alert("Comments are a demo feature in this single-file prototype.")}
+function newPost(){alert("Post composer demo — connect this to a backend to publish real posts.")}
+document.getElementById("search").addEventListener("input",e=>{
+ const q=e.target.value.toLowerCase();
+ const filtered=sampleGames.filter(g=>g.join(" ").toLowerCase().includes(q));
+ renderGames(q?filtered:sampleGames);
+});
+renderGames();
+</script>
+</body>
+</html>
