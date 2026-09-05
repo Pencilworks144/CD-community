@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CD Community - Social Media App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 40px;
+            display: none;
+        }
+
+        .container.active {
+            display: block;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            background: #f5f5f5;
+            border: 2px dashed #667eea;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            color: #667eea;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .file-input-label:hover {
+            background: #f0f0ff;
+        }
+
+        .file-name {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .toggle-link a {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .toggle-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #d32f2f;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .dashboard {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-header h2 {
+            color: #333;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .post-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .post-card p {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .post-meta {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .supported-formats {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sign Up Screen -->
+    <div id="signup" class="container active">
+        <div class="header">
+            <h1>CD Community</h1>
+            <p>Create your account</p>
+        </div>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="signup-username">Username</label>
+                <input type="text" id="signup-username" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-confirm">Confirm Password</label>
+                <input type="password" id="signup-confirm" required>
+            </div>
+            <div id="signup-error" class="error"></div>
+            <button type="submit" class="btn">Sign Up</button>
+            <div class="toggle-link">
+                Already have an account? <a onclick="toggleScreen()">Login</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login" class="container">
+        <div class="header">
+            <h1>CD Community</h1>
+            <p>Welcome back</p>
+        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" required>
+            </div>
+            <div id="login-error" class="error"></div>
+            <button type="submit" class="btn">Login</button>
+            <div class="toggle-link">
+                Don't have an account? <a onclick="toggleScreen()">Sign Up</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="container">
+        <div class="dashboard-header">
+            <div>
+                <h2>Welcome, <span id="username">User</span></h2>
+                <p style="color: #999; font-size: 14px;">CD Community</p>
+            </div>
+            <button class="btn logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('video')">Upload Video</button>
+            <button class="tab-btn" onclick="switchTab('game')">Upload Game</button>
+            <button class="tab-btn" onclick="switchTab('feed')">Feed</button>
+        </div>
+
+        <!-- Upload Video Tab -->
+        <div id="video-tab" class="post-card">
+            <h3>📹 Upload Video</h3>
+            <form id="videoForm">
+                <div class="form-group">
+                    <label for="video-title">Video Title</label>
+                    <input type="text" id="video-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="video-description">Description</label>
+                    <textarea id="video-description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Select Video File</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="video-file" accept="video/*" required>
+                        <label for="video-file" class="file-input-label">Click or drag video here</label>
+                    </div>
+                    <div class="file-name" id="video-filename"></div>
+                    <div class="supported-formats">Supported: MP4, WebM, Ogg, etc.</div>
+                </div>
+                <button type="submit" class="btn">Upload Video</button>
+            </form>
+        </div>
+
+        <!-- Upload Game Tab -->
+        <div id="game-tab" class="post-card" style="display: none;">
+            <h3>🎮 Upload Game</h3>
+            <form id="gameForm">
+                <div class="form-group">
+                    <label for="game-title">Game Title</label>
+                    <input type="text" id="game-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="game-description">Description</label>
+                    <textarea id="game-description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Select Game File</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="game-file" accept=".exe,.iso,.rar,.apk,.ipa,.img,.dmg" required>
+                        <label for="game-file" class="file-input-label">Click or drag game file here</label>
+                    </div>
+                    <div class="file-name" id="game-filename"></div>
+                    <div class="supported-formats">Supported: .exe, .iso, .rar, .apk, .ipa, .img, .dmg</div>
+                </div>
+                <button type="submit" class="btn">Upload Game</button>
+            </form>
+        </div>
+
+        <!-- Feed Tab -->
+        <div id="feed-tab" style="display: none;">
+            <h3 style="color: #333; margin-bottom: 20px;">📺 Community Feed</h3>
+            <div id="feed-container"></div>
+        </div>
+    </div>
+
+    <script>
+        let users = JSON.parse(localStorage.getItem('cdUsers')) || [];
+        let currentUser = null;
+        let posts = JSON.parse(localStorage.getItem('cdPosts')) || [];
+
+        function toggleScreen() {
+            document.getElementById('signup').classList.toggle('active');
+            document.getElementById('login').classList.toggle('active');
+            document.getElementById('signup-error').textContent = '';
+            document.getElementById('login-error').textContent = '';
+        }
+
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('signup-username').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            const errorDiv = document.getElementById('signup-error');
+
+            errorDiv.textContent = '';
+
+            if (password !== confirm) {
+                errorDiv.textContent = 'Passwords do not match';
+                return;
+            }
+
+            if (users.find(u => u.email === email)) {
+                errorDiv.textContent = 'Email already registered';
+                return;
+            }
+
+            users.push({ username, email, password });
+            localStorage.setItem('cdUsers', JSON.stringify(users));
+            alert('Account created! Please login.');
+            toggleScreen();
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            errorDiv.textContent = '';
+
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('cdCurrentUser', JSON.stringify(user));
+                showDashboard();
+            } else {
+                errorDiv.textContent = 'Invalid email or password';
+            }
+        });
+
+        function showDashboard() {
+            document.getElementById('login').classList.remove('active');
+            document.getElementById('signup').classList.remove('active');
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('username').textContent = currentUser.username;
+            loadFeed();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('cdCurrentUser');
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('login').classList.add('active');
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('[id$="-tab"]').forEach(el => el.style.display = 'none');
+            document.getElementById(tab + '-tab').style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        document.getElementById('videoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('video-title').value;
+            const description = document.getElementById('video-description').value;
+            const file = document.getElementById('video-file').files[0];
+
+            if (file) {
+                posts.unshift({
+                    type: 'video',
+                    title,
+                    description,
+                    filename: file.name,
+                    username: currentUser.username,
+                    date: new Date().toLocaleDateString()
+                });
+                localStorage.setItem('cdPosts', JSON.stringify(posts));
+                alert('Video uploaded successfully!');
+                this.reset();
+                document.getElementById('video-filename').textContent = '';
+                loadFeed();
+            }
+        });
+
+        document.getElementById('gameForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('game-title').value;
+            const description = document.getElementById('game-description').value;
+            const file = document.getElementById('game-file').files[0];
+
+            if (file) {
+                posts.unshift({
+                    type: 'game',
+                    title,
+                    description,
+                    filename: file.name,
+                    username: currentUser.username,
+                    date: new Date().toLocaleDateString()
+                });
+                localStorage.setItem('cdPosts', JSON.stringify(posts));
+                alert('Game uploaded successfully!');
+                this.reset();
+                document.getElementById('game-filename').textContent = '';
+                loadFeed();
+            }
+        });
+
+        document.getElementById('video-file').addEventListener('change', function() {
+            document.getElementById('video-filename').textContent = this.files[0] ? 'File: ' + this.files[0].name : '';
+        });
+
+        document.getElementById('game-file').addEventListener('change', function() {
+            document.getElementById('game-filename').textContent = this.files[0] ? 'File: ' + this.files[0].name : '';
+        });
+
+        function loadFeed() {
+            const feedContainer = document.getElementById('feed-container');
+            feedContainer.innerHTML = '';
+            
+            if (posts.length === 0) {
+                feedContainer.innerHTML = '<div class="post-card"><p style="text-align: center; color: #999;">No posts yet. Be the first to upload!</p></div>';
+                return;
+            }
+
+            posts.forEach(post => {
+                const icon = post.type === 'video' ? '📹' : '🎮';
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.innerHTML = `
+                    <h3>${icon} ${post.title}</h3>
+                    <p>${post.description}</p>
+                    <p style="color: #667eea; font-weight: 600;">File: ${post.filename}</p>
+                    <div class="post-meta">By ${post.username} • ${post.date}</div>
+                `;
+                feedContainer.appendChild(card);
+            });
+        }
+
+        // Check if user is already logged in
+        const savedUser = localStorage.getItem('cdCurrentUser');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            showDashboard();
+        }
+    </script>
+</body>
+</html>
